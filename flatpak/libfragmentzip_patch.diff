@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index e825d19..345c7ea 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -37,7 +37,7 @@ AM_CONDITIONAL(WIN32, test x$win32 = xtrue)
+ LIBCURL_REQUIRES_STR="libcurl >= 1.0"
+ LIBZIP_REQUIRES_STR="libzip >= 1.0"
+ LIBZ_REQUIRES_STR="zlib >= 1.0"
+-LIBGENERAL_REQUIRES_STR="libgeneral >= 48"
++LIBGENERAL_REQUIRES_STR="libgeneral >= 1"
+ 
+ 
+ # Checks for libraries.

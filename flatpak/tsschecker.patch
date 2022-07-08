@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index d96358d..2dd9d66 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -68,7 +68,7 @@ AC_ARG_WITH(
+ 
+ PKG_CHECK_MODULES(libplist, libplist-2.0 >= 2.2.0)
+ PKG_CHECK_MODULES(libcurl, libcurl >= 1.0)
+-PKG_CHECK_MODULES(libfragmentzip, libfragmentzip >= 48)
++PKG_CHECK_MODULES(libfragmentzip, libfragmentzip >= 1)
+ 
+ AS_IF([test "x$with_wolfssl" = xyes], [
+         PKG_CHECK_MODULES(wolfssl, wolfssl >= 1.0)

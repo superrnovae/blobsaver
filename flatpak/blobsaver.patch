@@ -1,0 +1,43 @@
+diff --git a/build.gradle b/build.gradle
+index a22a9fa..d4e3b90 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -42,12 +42,14 @@ def os = DefaultNativePlatform.currentOperatingSystem
+ 
+ startScripts.enabled = distZip.enabled = distTar.enabled = false
+ 
+-java.toolchain.languageVersion = JavaLanguageVersion.of(18)
++java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+ tasks.withType(JavaCompile).configureEach {
+-    sourceCompatibility = 18
++    sourceCompatibility = 17
+ }
+ 
+ repositories {
++    maven() { url = uri(".m2/repository") }
++    mavenLocal()
+     mavenCentral()
+ }
+ 
+@@ -64,7 +66,7 @@ dependencies {
+ }
+ 
+ javafx {
+-    version = '18'
++    version = '17'
+     modules = [ 'javafx.controls', 'javafx.fxml' ]
+ }
+ 
+diff --git a/settings.gradle b/settings.gradle
+index bfb1bd2..2193b76 100644
+--- a/settings.gradle
++++ b/settings.gradle
+@@ -2,6 +2,8 @@ pluginManagement {
+     repositories {
+         mavenCentral()
+         gradlePluginPortal()
++        maven { url ".m2/repository" }
++        mavenLocal()
+     }
+ }
+ 

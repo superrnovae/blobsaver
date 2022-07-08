@@ -1,0 +1,215 @@
+app-id: org.airsquared.blobsaver
+runtime: org.freedesktop.Platform
+runtime-version: '21.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+- org.freedesktop.Sdk.Extension.openjdk
+command: blobsaver
+finish-args:
+- "--share=ipc"
+- "--socket=x11"
+- "--socket=wayland"
+- "--device=all"
+- "--share=network"
+- "--filesystem=home"
+- "--filesystem=/run/udev"
+- "--filesystem=/run/usbmuxd"
+- "--filesystem=/run/usbmuxd.pid"
+- "--filesystem=xdg-run/gvfs"
+- "--persist=.java"
+- "--env=PATH=/app/jre/bin:/app/bin:/usr/bin"
+- "--env=JAVA_HOME=/app/jre"
+modules:
+- name: libfragmentzip
+  buildsystem: autotools
+  config-opts:
+  - "--disable-static"
+  sources:
+  - type: git
+    url: https://github.com/tihmstar/libfragmentzip.git
+  - type: patch
+    path: flatpak/libfragmentzip_patch.diff
+  build-options:
+    no-debuginfo: true
+  cleanup:
+  - "/include"
+  - "*.la"
+  - "/lib/pkgconfig"
+  modules:
+  - name: libzip
+    buildsystem: cmake
+    config-opts:
+    - "-DBUILD_SHARED_LIBS=ON"
+    - "-DCMAKE_INSTALL_PREFIX=/app"
+    - "-Dbuild_man=false"
+    sources:
+    - type: archive
+      url: https://github.com/nih-at/libzip/releases/download/v1.9.2/libzip-1.9.2.tar.gz
+      sha256: fd6a7f745de3d69cf5603edc9cb33d2890f0198e415255d0987a0cf10d824c6f
+    cleanup:
+    - "/include"
+    - "/share"
+    - "/bin"
+    - "/lib/cmake"
+    - "/lib/pkgconfig"
+    - "*.a"
+    build-options:
+      no-debuginfo: true
+  - name: libgeneral
+    buildsystem: autotools
+    config-opts:
+    - "--disable-static"
+    sources:
+    - type: git
+      url: https://github.com/tihmstar/libgeneral.git
+    build-options:
+      no-debuginfo: true
+    cleanup:
+    - "/include"
+    - "/lib/pkgconfig"
+    - "*.la"
+- name: libimobiledevice-glue
+  buildsystem: autotools
+  config-opts:
+  - "--disable-static"
+  sources:
+  - type: archive
+    url: https://github.com/libimobiledevice/libimobiledevice-glue/archive/d2ff7969dcd0a12e4f18f63dab03e6cd03054fcb.tar.gz
+    sha256: 81d456ae49a1c5bc772aa81768c7e88d0720263cdc7a3091d4aa689dd2912207
+  cleanup:
+  - "/include"
+  - "/lib/pkgconfig"
+  - "*.la"
+  build-options:
+    no-debuginfo: true
+  modules:
+  - name: libplist
+    buildsystem: autotools
+    config-opts:
+    - "--disable-static"
+    - "--without-cython"
+    sources:
+    - type: git
+      url: https://github.com/libimobiledevice/libplist.git
+    cleanup:
+    - "/include"
+    - "/share"
+    - "/bin"
+    - "/lib/pkgconfig"
+    - "*.la"
+    build-options:
+      no-debuginfo: true
+- name: libusbmuxd
+  buildsystem: autotools
+  config-opts:
+  - "--disable-static"
+  sources:
+  - type: git
+    url: https://github.com/libimobiledevice/libusbmuxd.git
+  cleanup:
+  - "*.la"
+  - "/include"
+  - "/lib/pkgconfig"
+  - "/share"
+  - "/bin"
+  build-options:
+    no-debuginfo: true
+- name: libirecovery
+  buildsystem: autotools
+  config-opts:
+  - "--disable-static"
+  sources:
+  - type: archive
+    url: https://github.com/libimobiledevice/libirecovery/archive/ab5b4d8d4c0e90c05d80f80c7e99a6516de9b5c6.tar.gz
+    sha256: d42174fe596568486d2c12c366fbee46909de32d0f97e6d9b2b2c08c96bc3f6b
+  cleanup:
+  - "/include"
+  - "/lib/pkgconfig"
+  - "/bin/irecovery"
+  - "/share"
+  - "*.a"
+  - "*.la"
+  build-options:
+    no-debuginfo: true
+  modules:
+  - name: libusb
+    buildsystem: autotools
+    config-opts:
+    - "--disable-static"
+    sources:
+    - type: archive
+      url: https://github.com/libusb/libusb/releases/download/v1.0.26/libusb-1.0.26.tar.bz2
+      sha256: 12ce7a61fc9854d1d2a1ffe095f7b5fac19ddba095c259e6067a46500381b5a5
+    cleanup:
+    - "/include"
+    - "/lib/pkgconfig"
+    - "*.la"
+    build-options:
+      no-debuginfo: true
+- name: libimobiledevice
+  buildsystem: autotools
+  config-opts:
+  - "--disable-static"
+  sources:
+  - type: git
+    url: https://github.com/libimobiledevice/libimobiledevice.git
+  cleanup:
+  - "/include"
+  - "/lib/pkgconfig"
+  - "/share"
+  - "/bin"
+  - "*.la"
+  build-options:
+    no-debuginfo: true
+- name: blobsaver
+  buildsystem: simple
+  build-options:
+    no-debuginfo: true
+    env:
+      PATH: "/app/bin:/usr/bin:/usr/lib/sdk/openjdk/bin"
+      MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+      JAVA_HOME: "/usr/lib/sdk/openjdk/jvm/openjdk-17"
+  sources:
+  - type: dir
+    path: .
+  - flatpak/dependencies.json
+  build-commands:
+  - /usr/lib/sdk/openjdk/bin/gradle --offline jlink
+  - jlink 
+    --no-header-files --no-man-pages --compress 2
+    --launcher blobsaver=airsquared.blobsaver/airsquared.blobsaver.app.Main  
+    --module-path build/jlinkbase/jlinkjars 
+    --add-modules airsquared.blobsaver
+    --output runtime 
+  - jpackage --type app-image 
+    --runtime-image runtime 
+    --input build/libs 
+    --module-path build/jlinkbase/jlinkjars 
+    --module airsquared.blobsaver/airsquared.blobsaver.app.Main
+    --dest . 
+    --java-options '-Djar.directory=/app/lib' 
+    --java-options '--add-exports=java.base/jdk.internal.misc=airsquared.blobsaver'
+    --java-options '--add-exports=javafx.graphics/com.sun.javafx.css=airsquared.blobsaver'
+    --name blobsaver
+    --description 'A cross-platform GUI app for saving SHSH blobs'
+    --copyright 'Copyright (c) 2021 airsquared'
+    --app-version '3.2.1' 
+  - cp -a blobsaver/. $FLATPAK_DEST
+  modules:
+  - name: openjdk
+    buildsystem: simple
+    build-commands:
+    - source /usr/lib/sdk/openjdk/install.sh
+- name: tsschecker
+  buildsystem: autotools
+  sources:
+  - type: git
+    url: https://github.com/1Conan/tsschecker.git
+  - type: patch
+    path: flatpak/tsschecker.patch
+  build-options:
+    no-debuginfo: true
+  post-install:
+  - mv $FLATPAK_DEST/bin/tsschecker $FLATPAK_DEST/lib
+  cleanup:
+  - "*.a"
