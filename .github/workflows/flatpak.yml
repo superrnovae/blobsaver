@@ -40,8 +40,8 @@ jobs:
         name: blobsaver-${{ matrix.arch }}
         path: '*.flatpak'
     - name: Upload reports on failure
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: failure-${{ matrix.arch }}
-          path: build/reports/
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: failure-${{ matrix.arch }}
+        path: build/reports/
