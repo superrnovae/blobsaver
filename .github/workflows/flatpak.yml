@@ -31,14 +31,14 @@ jobs:
     - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v4
       name: "Build flatpak bundle"
       with:
-        bundle: blobsaver
+        bundle: blobsaver.flatpak
         manifest-path: org.airsquared.blobsaver.yaml
         cache-key: flatpak-builder-${{ github.sha }}
     - uses: actions/upload-artifact@v3
       name: Upload artifacts
       with:
         name: blobsaver-${{ matrix.arch }}
-        path: '*.flatpak'
+        path: blobsaver.flatpak
     - name: Upload reports on failure
       if: ${{ failure() }}
       uses: actions/upload-artifact@v3
