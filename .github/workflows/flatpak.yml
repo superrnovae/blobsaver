@@ -25,7 +25,7 @@ jobs:
         dnf -y -q install git binutils
     - name: Generate gradle dependencies
       run: |
-        git patch flatpak/blobsaver.patch
+        git apply flatpak/blobsaver.patch
         ./gradlew -g gradle-cache/ --info --console verbose jlink > gradle-log.txt
         ./flatpak/flatpak-gradle-generator.py gradle-log.txt dependencies.json
     - uses: bilelmoussaoui/flatpak-github-actions/flatpak-builder@v4
